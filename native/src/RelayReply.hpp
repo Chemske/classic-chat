@@ -3,14 +3,21 @@
 #include <QNetworkReply>
 #include <QThread>
 #include <QAtomicInt>
+#include <QMutex>
 
 bool initializeRelayNetwork();
 
 // A bounded, cancellable request on BB10's TLS 1.2 capable native libcurl.
 class RelayWorker : public QThread {
+    Q_OBJECT
 public:
     RelayWorker(const QUrl &url, const QByteArray &body, const QByteArray &token, QObject *parent);
     QByteArray url, body, token, caPath, response;
+    QMutex responseMutex;
+    int receivedBytes;
+signals:
+    void dataAvailable();
+public:
     QAtomicInt cancelled;
     long status;
     bool failed, tooLarge;
@@ -30,6 +37,7 @@ public:
 protected:
     qint64 readData(char *data, qint64 maxSize);
 private slots:
+    void consume();
     void complete();
 private:
     RelayWorker *worker;

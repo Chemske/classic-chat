@@ -33,6 +33,10 @@ Q_DECL_EXPORT int main(int argc, char **argv) {
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
     ChatController controller;
     qWarning() << "ClassicChat controller ready";
+    QmlDocument *filesCheck = QmlDocument::create("asset:///FilesPage.qml").parent(&app);
+    filesCheck->setContextProperty("_chat", &controller);
+    qWarning() << "ClassicChat files document" << filesCheck->hasErrors() << filesCheck->errors().size();
+    foreach (const QDeclarativeError &error, filesCheck->errors()) qWarning() << "ClassicChat files QML:" << error.toString();
     QmlDocument *qml = QmlDocument::create("asset:///main.qml").parent(&app);
     qWarning() << "ClassicChat document loaded" << qml->hasErrors() << qml->errors().size();
     qml->setContextProperty("_chat", &controller);

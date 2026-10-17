@@ -7,7 +7,9 @@ NavigationPane {
     onCreationCompleted: {
         _chat.answerReceived.connect(function() {
             composer.text = "";
-            conversation.scrollToPosition(ScrollPosition.End, ScrollAnimation.Smooth);
+        });
+        _chat.scrollRequested.connect(function() {
+            if (conversation.followAnswer) conversation.scrollToPosition(ScrollPosition.End, ScrollAnimation.Smooth);
         });
         _chat.stateChanged.connect(function() {
             if (_chat.busy) spinner.start(); else spinner.stop();
@@ -33,6 +35,13 @@ NavigationPane {
                     textStyle.base: SystemDefaults.TextStyles.BodyText
                     textStyle.fontWeight: FontWeight.Bold
                     textStyle.color: Color.create("#F1F4F6")
+                }
+                Button {
+                    text: "↓"
+                    visible: !conversation.followAnswer && _chat.messageCount > 0
+                    preferredWidth: ui.du(7)
+                    preferredHeight: ui.du(6)
+                    onClicked: { conversation.followAnswer = true; conversation.scrollToPosition(ScrollPosition.End, ScrollAnimation.Smooth); }
                 }
                 Button {
                     text: "Menu"
@@ -69,7 +78,10 @@ NavigationPane {
             }
             ListView {
                 id: conversation
+                property variant chatController: _chat
                 property real itemWidth: 720
+                property bool followAnswer: true
+                onTouch: if (event.isMove()) followAnswer = false
                 visible: _chat.messageCount > 0
                 layoutProperties: StackLayoutProperties { spaceQuota: 1 }
                 dataModel: _chat.messages
@@ -81,6 +93,7 @@ NavigationPane {
                         type: ""
                         Container {
                             id: messageRow
+                            property variant chatController: ListItem.view.chatController
                             preferredWidth: ListItem.view.itemWidth
                             topPadding: ui.du(1)
                             bottomPadding: ui.du(1)
@@ -108,6 +121,20 @@ NavigationPane {
                                     textStyle.base: SystemDefaults.TextStyles.BodyText
                                     textStyle.color: Color.create("#F1F4F6")
                                 }
+                                Label {
+                                    visible: ListItemData.fileName !== undefined && ListItemData.fileName.length > 0
+                                    text: ListItemData.fileName !== undefined ? ListItemData.fileName : ""
+                                    multiline: true
+                                    textFormat: TextFormat.Plain
+                                    textStyle.base: SystemDefaults.TextStyles.SmallText
+                                    textStyle.color: Color.create("#8FD8C5")
+                                }
+                                Button {
+                                    visible: ListItemData.fileName !== undefined && ListItemData.fileName.length > 0
+                                    text: "Opslaan op SD"
+                                    enabled: !messageRow.chatController.busy
+                                    onClicked: messageRow.chatController.downloadFile(ListItemData.messageIndex)
+                                }
                             }
                         }
                     }
@@ -124,23 +151,51 @@ NavigationPane {
                     layout: StackLayout { orientation: LayoutOrientation.LeftToRight }
                     ActivityIndicator { id: spinner; visible: _chat.busy; preferredWidth: ui.du(3); preferredHeight: ui.du(3) }
                     Label {
-                        text: _chat.status.length > 0 ? _chat.status : "Klaar voor je bericht"
+                        text: _chat.busy ? (_chat.status.indexOf("Zoeken") === 0 ? "Zoeken op internet…" : "Antwoord wordt geschreven…") : (_chat.status.length > 0 ? _chat.status : "Klaar voor je bericht")
                         multiline: true
                         textStyle.base: SystemDefaults.TextStyles.SmallText
                         textStyle.color: Color.create("#9AA9B5")
                         textFormat: TextFormat.Plain
                         layoutProperties: StackLayoutProperties { spaceQuota: 1 }
                     }
+                    Button { text: "Stop"; visible: _chat.busy; preferredWidth: ui.du(11); preferredHeight: ui.du(6); onClicked: _chat.cancel() }
                 }
                 Container {
+                    visible: !_chat.busy && _chat.attachmentName.length > 0
+                    layout: StackLayout { orientation: LayoutOrientation.LeftToRight }
+                    Label {
+                        text: "Bijlage: " + _chat.attachmentName
+                        textFormat: TextFormat.Plain
+                        multiline: true
+                        textStyle.base: SystemDefaults.TextStyles.SmallText
+                        textStyle.color: Color.create("#8FD8C5")
+                        layoutProperties: StackLayoutProperties { spaceQuota: 1 }
+                    }
+                    Button { text: "Wis"; preferredWidth: ui.du(10); enabled: !_chat.busy; onClicked: _chat.clearAttachment() }
+                }
+                Container {
+                    visible: !_chat.busy
                     topMargin: ui.du(1)
                     layout: StackLayout { orientation: LayoutOrientation.LeftToRight }
+                    Button {
+                        text: "+"
+                        preferredWidth: ui.du(7)
+                        verticalAlignment: VerticalAlignment.Center
+                        enabled: !_chat.busy
+                        onClicked: {
+                            if (!_chat.openAttachmentBrowser(true)) _chat.openAttachmentBrowser(false);
+                            var page = attachmentPage.createObject();
+                            page.selected.connect(function() { navigation.pop(); }); navigation.push(page);
+                        }
+                    }
                     TextArea {
                         id: composer
                         hintText: "Schrijf een bericht…"
                         enabled: !_chat.busy
                         maximumLength: 16000
-                        preferredHeight: ui.du(10)
+                        preferredHeight: ui.du(8)
+                        minHeight: ui.du(7)
+                        maxHeight: ui.du(11)
                         textFormat: TextFormat.Plain
                         layoutProperties: StackLayoutProperties { spaceQuota: 1 }
                     }
@@ -150,7 +205,7 @@ NavigationPane {
                         preferredWidth: ui.du(13)
                         verticalAlignment: VerticalAlignment.Center
                         enabled: _chat.busy || composer.text.trim().length > 0
-                        onClicked: { if (_chat.busy) _chat.cancel(); else _chat.sendMessage(composer.text); }
+                        onClicked: { if (_chat.busy) _chat.cancel(); else { conversation.followAnswer = true; _chat.sendMessage(composer.text); } }
                     }
                 }
             }
@@ -208,12 +263,13 @@ NavigationPane {
                 }
             }
         },
+        ComponentDefinition { id: attachmentPage; source: "FilesPage.qml" },
         ComponentDefinition { id: historyPage; source: "HistoryPage.qml" },
         ComponentDefinition { id: settingsPage; source: "SettingsPage.qml" },
         SystemDialog {
             id: deleteDialog
             title: "Deze chat verwijderen?"
-            body: "Alleen dit gesprek wordt uit Classic Chat verwijderd. Eventuele tekstexports blijven bewaard."
+            body: "Alleen dit gesprek wordt uit Classic Chat verwijderd. Downloads en tekstexports blijven bewaard."
             confirmButton.label: "Verwijder"
             cancelButton.label: "Annuleer"
             onFinished: {

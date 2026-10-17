@@ -7,6 +7,7 @@
 #include <string.h>
 #include <limits.h>
 #include <QMutex>
+#include <QMutexLocker>
 #include <openssl/crypto.h>
 
 namespace {
@@ -29,13 +30,17 @@ bool initializeRelayNetwork() {
 RelayWorker::RelayWorker(const QUrl &address, const QByteArray &bytes, const QByteArray &secret, QObject *parent)
     : QThread(parent), url(address.toEncoded()), body(bytes), token(secret),
       caPath(QFile::encodeName(QDir::currentPath() + "/app/native/assets/certificates/isrgrootx1.pem")),
-      cancelled(0), status(0), failed(true), tooLarge(false) {}
+      receivedBytes(0), cancelled(0), status(0), failed(true), tooLarge(false) {}
 size_t RelayWorker::receive(char *data, size_t size, size_t count, void *context) {
     RelayWorker *w = static_cast<RelayWorker *>(context);
     if (w->cancelled.fetchAndAddOrdered(0) || (size && count > size_t(-1) / size)) return 0;
     const size_t bytes = size * count;
-    if (bytes > size_t(256 * 1024 - w->response.size())) { w->tooLarge = true; return 0; }
-    w->response.append(data, int(bytes)); return bytes;
+    if (bytes > size_t(256 * 1024 - w->receivedBytes)) { w->tooLarge = true; return 0; }
+    bool notify;
+    { QMutexLocker lock(&w->responseMutex); notify = w->response.isEmpty(); w->response.append(data, int(bytes)); }
+    w->receivedBytes += int(bytes);
+    if (notify) emit w->dataAvailable();
+    return bytes;
 }
 int RelayWorker::progress(void *context, double, double, double, double) {
     return static_cast<RelayWorker *>(context)->cancelled.fetchAndAddOrdered(0) ? 1 : 0;
@@ -75,19 +80,26 @@ RelayReply::RelayReply(const QNetworkRequest &request, const QByteArray &body, c
     : QNetworkReply(parent), worker(new RelayWorker(request.url(), body, token, this)), offset(0) {
     setRequest(request); setUrl(request.url()); setOperation(QNetworkAccessManager::PostOperation);
     open(QIODevice::ReadOnly | QIODevice::Unbuffered);
+    connect(worker, SIGNAL(dataAvailable()), this, SLOT(consume()), Qt::QueuedConnection);
     connect(worker, SIGNAL(finished()), this, SLOT(complete())); worker->start();
 }
 RelayReply::~RelayReply() { worker->cancelled.fetchAndStoreOrdered(1); worker->wait(); }
 void RelayReply::abort() { worker->cancelled.fetchAndStoreOrdered(1); }
 qint64 RelayReply::bytesAvailable() const { return buffer.size() - offset + QNetworkReply::bytesAvailable(); }
 qint64 RelayReply::readData(char *data, qint64 maxSize) {
-    const qint64 left = buffer.size() - offset; if (!left) return -1;
-    const qint64 count = qMin(left, maxSize); memcpy(data, buffer.constData() + offset, size_t(count)); offset += count; return count;
+    const qint64 left = buffer.size() - offset; if (!left) return isFinished() ? -1 : 0;
+    const qint64 count = qMin(left, maxSize); memcpy(data, buffer.constData() + offset, size_t(count)); offset += count; if (offset == buffer.size()) { buffer.clear(); offset = 0; } return count;
+}
+void RelayReply::consume() {
+    QByteArray bytes;
+    { QMutexLocker lock(&worker->responseMutex); bytes = worker->response; worker->response.clear(); }
+    if (bytes.isEmpty()) return;
+    buffer.append(bytes); emit readyRead();
 }
 void RelayReply::complete() {
     setAttribute(QNetworkRequest::HttpStatusCodeAttribute, int(worker->status));
-    buffer = worker->response;
-    if (worker->tooLarge) buffer = QByteArray(256 * 1024 + 1, ' ');
+    consume();
+    if (worker->tooLarge) { buffer = QByteArray(256 * 1024 + 1, ' '); offset = 0; }
     if (worker->failed) setError(QNetworkReply::UnknownNetworkError, "HTTPS request failed");
     setFinished(true);
     if (!buffer.isEmpty()) emit readyRead();

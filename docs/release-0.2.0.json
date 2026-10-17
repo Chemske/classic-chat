@@ -1,0 +1,55 @@
+{
+  "version": "0.2.0",
+  "server_tests_passed": 20,
+  "server_tests_failed": 0,
+  "native_build_succeeded": true,
+  "native_sd_test": {
+    "sd_browser_opened": true,
+    "chat_fixture_loaded": true,
+    "native_download_saved": true,
+    "sd_download_readback_matches": true
+  },
+  "live_relay_checks": [
+    {
+      "name": "stream",
+      "ok": true,
+      "delta_events": 85,
+      "first_text_seconds": 1.63,
+      "total_seconds": 2.2
+    },
+    {
+      "name": "generated_text_file",
+      "ok": true,
+      "files": 1
+    },
+    {
+      "name": "text_attachment",
+      "ok": true,
+      "test_code_matches": true
+    },
+    {
+      "name": "image_jpeg_ocr",
+      "ok": true,
+      "delta_events": 18,
+      "first_text_seconds": 0.89,
+      "total_seconds": 1.06,
+      "files": 0,
+      "ocr_matches": true
+    }
+  ],
+  "user_confirmed": {
+    "streaming": true,
+    "long_reply_following": true,
+    "sd_folder_navigation": true,
+    "download_button": true
+  },
+  "pending_visual_check": [
+    "Latest thumbnail grid after QML syntax fix"
+  ],
+  "bar_sha256": "dd30522f3b0017532f8c3b172ffa1807cc7aa123a14bd3cbcd2f526cc22ae78d",
+  "installed_asset_readback_verified": 9,
+  "qml_validation": {
+    "main_errors": 0,
+    "files_page_errors": 0
+  }
+}

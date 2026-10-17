@@ -2,13 +2,13 @@
 
 Een native AI-chatapp voor de BlackBerry Classic met BlackBerry 10. De C++/QML-client gebruikt Cascades en praat via HTTPS met een eigen Node.js-tussenserver. De OpenAI API-sleutel blijft op de server; het toestel gebruikt een afzonderlijk toegangstoken.
 
-## Huidige versie — 0.1.1
+## Huidige versie — 0.2.0
 
 De werkende basis is op 17 oktober 2026 getest op een SQC100-1 met OS 10.3.3.3216 en radio 10.3.3.3217. Chatten, internetzoeken met bronverwijzingen en automatisch opslaan op SD zijn op het toestel bevestigd. De donkere interface heeft een compacte bovenbalk en een Menu-knop voor gesprekken en instellingen.
 
-De app ondersteunt tekstgesprekken, annuleren, lokale gespreksgeschiedenis en TXT-export. De server biedt het model een webzoekfunctie aan. De huidige client ontvangt het volledige antwoord; streaming, bestandsbijlagen en foto-invoer zijn geplande uitbreidingen.
+De app ondersteunt gestreamde antwoorden, annuleren, lokale gespreksgeschiedenis, TXT-export, een tekst- of fotobijlage per bericht en downloadbare tekstbestanden op SD. De plusknop opent een donkere bestandskiezer met aparte SD- en toestelbediening. Zie [streaming en bestanden](docs/streaming-en-bestanden.md) voor limieten en opslag. De server biedt het model webzoeken aan en kent de BlackBerry-omgeving.
 
-Versie 0.1.1 gebruikt de aanwezige native libcurl met TLS 1.2 en een gebundeld publiek ISRG Root X1-certificaat. Certificaat- en hostnaamcontrole blijven ingeschakeld. Het vaste serveradres is op de BlackBerry getest met een echt antwoord.
+De client gebruikt de aanwezige native libcurl met TLS 1.2 en een gebundeld publiek ISRG Root X1-certificaat. Certificaat- en hostnaamcontrole blijven ingeschakeld. Het vaste serveradres is op de BlackBerry getest met een echt antwoord.
 
 ## Project
 
@@ -24,7 +24,7 @@ Versie 0.1.1 gebruikt de aanwezige native libcurl met TLS 1.2 en een gebundeld p
 Gebruik Node.js 22 of nieuwer. Maak een private configuratie op basis van `server/.env.example`; commit die configuratie niet.
 
 ```sh
-node --test tests/server.test.mjs
+node --test tests/*.test.mjs
 node --env-file=/pad/naar/private.env server/server.mjs
 ```
 
@@ -38,7 +38,7 @@ Het ontwikkelpakket is ongetekend. Een gewone stock-installatie kan een geldig d
 
 ## Opslag en privacy
 
-Chats staan standaard op de SD-kaart onder `ClassicChat/chats`; TXT-exports staan onder `ClassicChat/exports`. Zonder kaart valt de app niet stilzwijgend terug op interne opslag. De kleine appinstellingen gebruiken wel interne opslag. Chatbestanden op SD zijn gewone, onversleutelde tekst.
+Chats staan standaard op de SD-kaart onder `ClassicChat/chats`; TXT-exports staan onder `ClassicChat/exports` en downloads onder `ClassicChat/downloads`. Bijlagen blijven alleen gedurende hun aanvraag in het geheugen; ze worden niet automatisch bij vervolgvraag herhaald. Een aangeboden klein tekstbestand blijft ook in de lokale chat bewaard om later te kunnen downloaden. Downloads en exports blijven bij chatverwijdering behouden. Zonder kaart valt de app niet stilzwijgend terug op interne opslag. De kleine appinstellingen gebruiken wel interne opslag. Chatbestanden op SD zijn gewone, onversleutelde tekst.
 
 De relay bewaart geen blijvend chatarchief en logt geen berichtinhoud. Hij gebruikt de Responses API met `store:false`; dat is geen garantie dat OpenAI geen andere bewaartermijnen toepast. Internetzoeken kan aanvullende API-kosten veroorzaken.
 

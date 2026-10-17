@@ -39,3 +39,9 @@ Een volledige normale toestelherstart is bevestigd. coreServices2 startte zelfst
 Een eerdere opdracht via de Mac werd onderbroken voordat de normale afsluitprocedure klaar was. Gebruik het aan/uitmenu voor een normale herstart; stuur geen tweede herstart terwijl de eerste loopt. Er is voor deze controle geen firmware overgedragen.
 
 Versie 0.1.1 is daarna als appupdate geïnstalleerd en byte voor byte gecontroleerd, inclusief het openbare CA-certificaat. De oorspronkelijke werkende bron blijft in Git-tag v0.1.0. Gebruik bij een rollback ook het installatiescript uit die tag: de nieuwere installer verwacht aanvullend het CA-bestand dat nog niet in het oude pakket zat. De BAR-bestanden en bestaande privé-back-ups blijven lokaal en horen niet in Git. De oude tijdelijke endpoint is gestopt; een oude build heeft geen bevestigde TLS 1.2-route naar het nieuwe vaste adres.
+
+## Appupdate 0.2.0
+
+De update verandert alleen Classic Chat en de relay; er is geen firmware geflasht. De vorige relaycode staat privé op de VPS onder /opt/classicchat/server/server.before-0.2.0.mjs. Een rollback bestaat uit het gecontroleerd terugplaatsen van die code en herstarten van classicchat.service; de oude native client gebruikt het bestaande JSON-protocol. De nieuwe relay accepteert ook oude clients.
+
+De lokale BAR van versie 0.1.1 en de private instellingen vóór 0.2.0 zijn behouden. Voor een oude BAR gebruik je het installatiescript uit dezelfde Git-tag: de nieuwe installer verwacht ook FilesPage.qml en de drie nieuwe pictogrammen. Bijlagen worden niet duurzaam naar de VPS geschreven. Downloads die de gebruiker op SD opslaat, blijven bij het verwijderen van een chat bestaan.

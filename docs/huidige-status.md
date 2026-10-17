@@ -1,6 +1,6 @@
 # Classic Chat — 17 oktober 2026
 
-Versie 0.1.1 staat op de BlackBerry Classic SQC100-1, OS 10.3.3.3216 / radio 10.3.3.3217. Native tekstchat, internetzoeken met bronverwijzingen, compacte donkere interface en SD-opslag zijn eerder op het toestel bevestigd. De gebruiker bevestigt ook dat de nieuwe versie een echt antwoord geeft via https://classicchat.130-61-37-71.sslip.io.
+Versie 0.2.0 staat op de BlackBerry Classic SQC100-1, OS 10.3.3.3216 / radio 10.3.3.3217. Native tekstchat, internetzoeken met bronverwijzingen, compacte donkere interface en SD-opslag zijn eerder op het toestel bevestigd. De vaste verbinding is eerder met een echt antwoord bevestigd via https://classicchat.130-61-37-71.sslip.io.
 
 De broncode staat op https://github.com/Chemske/classic-chat. De eerste werkende basis is bewaard als v0.1.0. Private configuraties, SSH-sleutels, media, firmware en back-ups zijn uitgesloten.
 
@@ -12,4 +12,6 @@ Qt op dit toestel bood alleen TLS 1.0 aan. Versie 0.1.1 gebruikt daarom een canc
 
 Het geïnstalleerde programma, de drie QML-schermen en het CA-certificaat zijn teruggelezen en komen exact met de nieuwe BAR overeen. De app laadt zonder QML-fouten. In deze update is geen firmware geflasht, geen andere app verwijderd en geen chat/media gewist.
 
-Chats staan standaard op SD onder ClassicChat/chats; exports onder ClassicChat/exports. TXT-export en de volledige geschiedenisinterface zijn nog niet apart doorlopen. Streaming en bijlagen zijn nog niet geïmplementeerd. Zie VPS-handleiding.md, build.md en recovery.md voor beheer en herstel.
+Chats staan standaard op SD onder ClassicChat/chats; exports onder ClassicChat/exports. TXT-export en de volledige geschiedenisinterface zijn nog niet apart doorlopen. Streaming, tekst- en fotobijlagen en aangeboden tekstbestanden zijn geïmplementeerd; zie streaming-en-bestanden.md voor limieten en de actuele controles. De app kent een eigen donkere SD-bestandskiezer. Zie VPS-handleiding.md, build.md en recovery.md voor beheer en herstel.
+
+De native SD-test heeft de echte browser-, chatlaad- en downloadcode op het toestel uitgevoerd. Een uitsluitend daarvoor aangemaakt bestand is op SD opgeslagen en byte voor byte teruggelezen; alleen de twee tijdelijke testbestanden zijn opgeruimd. De gebruiker bevestigt SD-mapnavigatie, een werkende opslagknop en zichtbare streaming. Het bestandsraster met pictogrammen/fotovoorbeelden en de compactere invoer met beter volgen tijdens streaming zijn daarna toegevoegd.
