@@ -2,6 +2,7 @@
 #include <bb/cascades/QmlDocument>
 #include <bb/cascades/AbstractPane>
 #include "ChatController.hpp"
+#include "RelayReply.hpp"
 #include <QTextCodec>
 #include <QDebug>
 #include <QtDeclarative/QDeclarativeError>
@@ -21,6 +22,7 @@ void startupMessage(QtMsgType, const char *message) {
 }
 }
 Q_DECL_EXPORT int main(int argc, char **argv) {
+    if (!initializeRelayNetwork()) return 2;
     Application app(argc, argv);
     remove("logs/classicchat-startup.log");
     qInstallMsgHandler(startupMessage);

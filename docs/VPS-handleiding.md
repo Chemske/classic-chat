@@ -1,93 +1,37 @@
-# Classic Chat — VPS en verdere installatie
+# VPS en vast HTTPS-adres
 
-Bijgewerkt op 16 oktober 2026. Dit document vervangt de eerdere status waarin de Mac de publieke server draaide.
+Actueel, 17 oktober 2026: https://classicchat.130-61-37-71.sslip.io. Het publieke IP is 130.61.37.71. Dit adres gebruikt sslip.io en vereist geen afzonderlijk domein of Cloudflare-account. Het blijft gelijk zolang het publieke VPS-IP gelijk blijft; DNS blijft afhankelijk van sslip.io.
 
-## Wat werkt
+## Actieve inrichting
 
-De tussenserver draait op jouw Oracle VPS, onafhankelijk van de Mac. Het huidige publieke adres is:
+Ubuntu 24.04 ARM64 met een onprivileged `classicchat`-account. Node staat onder `/opt/classicchat/node`; de relay onder `/opt/classicchat/server/server.mjs`. De private configuratie staat uitsluitend in `/etc/classicchat/relay.env`, eigenaar root:classicchat, modus 640. De relay luistert op 127.0.0.1:8787.
 
-**https://retrieve-cos-questions-fancy.trycloudflare.com**
+Caddy uit de ondertekende Ubuntu-pakketten beheert HTTPS en certificaatvernieuwing. `/etc/caddy/Caddyfile` bevat het vaste adres, `tls { key_type rsa2048 }` en `reverse_proxy 127.0.0.1:8787`. Zie `deploy/vps/Caddyfile.example`. De ACME-CA is expliciet Let's Encrypt. TCP 80 en 443 moeten zowel in Oracle als op de host bereikbaar blijven. Poort 8787 wordt niet openbaar gemaakt.
 
-Je hebt de statuspagina op de BlackBerry geopend en bevestigd dat deze werkt. Een afzonderlijke echte API-aanroep via dit publieke adres gaf **“VPS werkt.”** terug. De server kan via wifi en mobiele data worden benaderd; de native app moet nog op het toestel worden geïnstalleerd en getest.
+`classicchat.service` start de relay rechtstreeks; er draait geen tijdelijke Cloudflare-tunnel meer. `classicchat` en `caddy` zijn ingeschakeld voor automatisch opstarten. De bestaande Oracle-firewallregels zijn behouden; alleen TCP 80/443 zijn toegestaan en met netfilter-persistent opgeslagen.
 
-Dit is een tijdelijk Cloudflare-adres. Het kan veranderen wanneer de tunnel of VPS opnieuw start. Er is nog geen vast domein ingesteld. De Mac hoeft niet aan te staan. De VPS moet aanstaan en internet hebben.
+## Nieuwe installatie
 
-De server gebruikt HTTPS en een apart toestel-token voor chatverzoeken. De OpenAI-sleutel staat in de private serverconfiguratie. De BlackBerry krijgt uiteindelijk alleen het serveradres en het toestel-token. Zonder token geeft chatten HTTP 401; een verzoek naar `/.env` gaf 404.
+De voorbeelden zijn geen script om een bestaande server te overschrijven.
 
-## Serverbeheer
+1. Gebruik een lege stagingmap op een Ubuntu ARM64-machine. Download met `deploy/vps/download-runtime.py` de gecontroleerde Node-runtime. De optionele `--with-tunnel` is uitsluitend voor het oude tijdelijke ontwikkeltransport.
+2. Kopieer `server/server.mjs`, `deploy/vps/classicchat.service` en `deploy/vps/install.sh` naar dezelfde stagingmap. `install.sh` verwacht de runtime en `runtime-provenance.json` daar en weigert een bestaande `/opt/classicchat` te overschrijven. Voer het script met sudo uit.
+3. Maak `/etc/classicchat/relay.env` op basis van `server/.env.example`, met de echte API-sleutel en een apart toestel-token. Gebruik root:classicchat en modus 640. Geen sleutels in Git, shellgeschiedenis of BAR-pakketten.
+4. Installeer Caddy uit de Ubuntu-pakketten. Vul een correct resolvend hostadres in het configuratievoorbeeld in en laat Caddy de configuratie valideren. Open in Oracle en de hostfirewall TCP 80/443; behoud de bestaande SSH- en Oracle-regels.
+5. Start en activeer classicchat en caddy met systemd. Controleer `/health` vanaf buiten de VPS en controleer dat een aanvraag zonder toestel-token 401 krijgt.
+6. Configureer de app met het HTTPS-adres en uitsluitend het aparte toestel-token. Versie 0.1.1 gebruikt de native TLS 1.2-route; oudere Qt-builds zijn niet geschikt voor deze endpoint.
 
-Verbind via SSH als `ubuntu` op `130.61.37.71`, met de bestaande sleutel in `Bureaublad/blackberry/ssh-to-vps`. De dienst draait onder de eigen gebruiker `classicchat` en start automatisch met de VPS.
+## Gecontroleerd op de actieve VPS
 
-Na verbinden via SSH:
+- DNS resolveert naar 130.61.37.71; HTTPS en geforceerd TLS 1.2 worden vanaf de Mac geverifieerd.
+- `/health` geeft 200 met `ok:true,demo:false`; `/.env` geeft 404 en een chatrequest zonder token 401.
+- Een volledige VPS-herstart is uitgevoerd. De Linux boot-ID veranderde; beide diensten waren actief en ingeschakeld en extern HTTPS werkte na circa 26 seconden opnieuw.
+- De BlackBerry gebruikt libcurl 7.42.0 / OpenSSL 1.0.2g. TLS 1.2 met het vaste adres is op het toestel getest; een onjuist HTTPS-hostadres wordt afgewezen. De gebruiker heeft een echt antwoord via de bijgewerkte native app bevestigd.
 
-```sh
-sudo systemctl status classicchat.service --no-pager
-sudo cat /var/lib/classicchat/Internetadres.txt
-```
+## Beheer en storingen
 
-De eerste opdracht controleert de dienst; de tweede toont het actuele internetadres. Dienst stoppen of opnieuw starten:
+Controleer `systemctl status classicchat caddy` en beperkte journalregels zonder berichtinhoud of headers te publiceren. De runtime logt geen chatinhoud. Het publieke adres is geen geheim; beide toegangssleutels zijn dat wel. Back-ups van de private configuratie en Caddy-certificaatopslag moeten privé blijven.
 
-```sh
-sudo systemctl stop classicchat.service
-sudo systemctl restart classicchat.service
-```
+Bij een veranderd VPS-IP moet ook het ingebedde IP in het sslip.io-adres veranderen. Bij certificaatproblemen controleer DNS, poorten, klok, Caddy en de CA-keten; schakel certificaat- of hostnaamcontrole nooit uit. Bewaar poort 80 voor ACME/HTTPS-doorverwijzing. De huidige appbundel vertrouwt ISRG Root X1 voor deze Let's Encrypt-keten. Een andere CA kan een bewust bijgewerkte trustbundel vereisen.
 
-Na een herstart moet het actuele adres opnieuw worden gelezen en zo nodig in de app worden aangepast. De dienst maakt zelf een nieuwe tijdelijke tunnel aan.
-
-| Onderdeel | Locatie op de VPS |
-| --- | --- |
-| Servercode en supervisor | `/opt/classicchat/server/` |
-| Private configuratie | `/etc/classicchat/relay.env` |
-| Actueel adres en dienststatus | `/var/lib/classicchat/` |
-| Systeemdienst | `/etc/systemd/system/classicchat.service` |
-
-De configuratie bevat de OpenAI-sleutel en het toestel-token. Neem de inhoud niet over in chat, screenshots of een broncodearchief. Er is een lokale ontwikkelkopie op de Mac gebleven. De eerdere Mac-internetdienst is gestopt en automatisch starten daarvan is uitgeschakeld.
-
-De VPS gebruikt Node.js 24.22.0 en cloudflared 2026.10.1 voor ARM64. De downloads zijn tegen gepubliceerde SHA-256-waarden gecontroleerd. De relay luistert op localhost; Cloudflare Tunnel verzorgt de publieke HTTPS-verbinding. Hiervoor zijn geen routerpoorten of inkomende poorten 80/443 op de VPS geopend. De bestaande SSH- en firewallinstellingen zijn behouden.
-
-## Back-up en herstel
-
-De gedeelde interne bestanden en de SD-kaart zijn naar de Mac gekopieerd en met SHA-256 gecontroleerd:
-
-| Kopie | Bestanden | Bytes |
-| --- | ---: | ---: |
-| Gedeelde interne bestanden | 46 | 68.748.602 |
-| SD-kaart | 107 | 7.764.057 |
-| Totaal | 153 | 76.512.659 |
-
-Ze staan in `Bureaublad/blackberry/backups/2026-10-16-shared-files` en `2026-10-16-sdcard`. De eerste kopie registreerde een mislukte SD-selectie; de SD-kaart is vervolgens afzonderlijk volledig gekopieerd. De oorspronkelijke manifests blijven bewaard.
-
-De standaardback-up voor private appgegevens en instellingen is **niet gelukt**. Er is geen bruikbaar volledig BBB-archief ontvangen. Je hebt bevestigd dat er geen belangrijke privégegevens aanwezig zijn. Er is ook **geen ruwe kopie van de huidige firmware** van het toestel gemaakt.
-
-Een stockfirmwarearchief met dezelfde OS- en radioversie is gedownload en lokaal uitgepakt: OS 10.3.3.3216, radio 10.3.3.3217, qc8960. De checksum komt overeen met de community-archiefmetadata. Dit bestand is geen back-up van jouw toestel en herstel ermee is nog niet op jouw toestel bewezen.
-
-## Native app: huidige blokkade
-
-Classic Chat is als echte Cascades-app voor QNX ARMv7 gebouwd. Het BAR-bestand is aanwezig en de pakketcontroles slagen. De gewone installatie is eerder geweigerd met **881: no debug token found**. De app is nog niet geïnstalleerd.
-
-Op 16 oktober is de herstelmodus zonder firmwarewijziging benaderd. Het BootROM-model is rechtstreeks uitgelezen als **0x9600270a**, passend bij de SQC100-1. Er is geen wachtwoordpoging in die herstelmodus verstuurd, geen RAM-loader geüpload en geen firmware geschreven. De telefoon is daarna weer normaal opgestart.
-
-De beschikbare Mac-tool bevat geen gevalideerde loaderkoppeling voor dat exacte model. Het gedownloade stock-archief heeft evenmin een expliciete descriptor voor dit ID. Dat bewijst geen algemene incompatibiliteit, maar de herstelroute is hiermee nog onvoldoende bevestigd om te flashen.
-
-De AutoRoot v3-patch is met REA en aanvullende broncode-inspectie onderzocht. De oorspronkelijke patch verwijdert apps en stopt diensten. In de lokale reviewversie zijn die onderdelen uitgeschakeld. Deze versie is nog geen vrijgegeven firmwarebeeld; de overige wijzigingen en modelondersteuning moeten eerst worden gevalideerd. De later beschreven AutoRoot v4-techniek levert momenteel evenmin een aangetoonde installatieroute op dit stocktoestel.
-
-Volgende concrete stappen:
-
-1. Een passende, ondertekende herstel-loader voor SQC100-1 valideren, met eerst alleen uitlezen en terug opstarten.
-2. De aangepaste firmware offline bouwen en controleren, zonder expliciete appverwijdering en met eigen SSH-sleutels. Flashen van een gebruikersbestandssysteem kan bestaande appgegevens vervangen; de reviewpatch voorkomt dat niet op zichzelf.
-3. Pas met een bewezen herstelroute de systeemwijziging en installatie van uitsluitend Classic Chat uitvoeren.
-4. Op het toestel starten, toetsenbord/trackpad, HTTPS naar de VPS en SD-opslag testen.
-
-De browserproef bewijst internetbereikbaarheid, maar nog niet dat de native Qt-netwerkclient dezelfde certificaatketen accepteert. Opslaan, exporteren en verwijderen van eigen chats moeten ook nog op het toestel worden getest.
-
-## Bronnen en bewijs
-
-- `ClassicChat-VPS-test.json`: echte API-aanroep via de VPS.
-- `ClassicChat-netwerkcontrole.json`: bereikbaarheid en toegangscontroles.
-- `BlackBerry-backupstatus.json`: samengevoegde back-upstatus.
-- `BlackBerry-herstelcontrole/bootrom-model.json`: beperkte modeluitlezing zonder privé-identificatoren.
-- [AutoRoot v3, instructies van de maker](https://bb10.root.sx/blog/pre-rooted-autoloaders-v3).
-- [Broncode van bb10mt](https://github.com/bb10root/bb10mt).
-- [Beschrijving van de v4-techniek](https://bb10.root.sx/blog/dynamic-library-hijacking-vulnerability-in-bb10).
-
-Er is in deze testfase niets op de BlackBerry verwijderd, geroot of geflasht. Er is geen herstelactie uitgevoerd.
+Een noodterugkeer naar de historische tunnel is een afzonderlijke beheerhandeling: een quick-tunneladres wijzigt bij herstart en de app moet dan opnieuw geconfigureerd worden. De vorige relay-unit staat privé op de server als `classicchat.service.before-fixed`; de oude URL is niet meer actief.

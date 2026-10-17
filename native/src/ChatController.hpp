@@ -56,7 +56,6 @@ private:
     void showMessages();
     bb::cascades::ArrayDataModel *m_messages, *m_chats;
     QSettings m_settings;
-    QNetworkAccessManager m_network;
     QNetworkReply *m_reply;
     QTimer m_timer;
     QByteArray m_response;

@@ -9,7 +9,7 @@ p.add_argument('--identity',required=True,type=pathlib.Path)
 p.add_argument('--known-hosts',type=pathlib.Path,help='Pinned known_hosts file for the device')
 p.add_argument('--legacy-bb10',action='store_true',help='Allow the old RSA SSH algorithms only for this device connection')
 p.add_argument('--via-devuser-root-helper',action='store_true',help='Use the already verified /base/bin/__root helper through development SSH')
-p.add_argument('--bar',type=pathlib.Path,default=pathlib.Path(__file__).resolve().parents[1]/'build/ClassicChat-0.1.0-unsigned.bar')
+p.add_argument('--bar',type=pathlib.Path,default=pathlib.Path(__file__).resolve().parents[1]/'build/ClassicChat-0.1.1-unsigned.bar')
 a=p.parse_args();ip=str(ipaddress.IPv4Address(a.ip));key=a.identity.expanduser().resolve()
 if not key.is_file():p.error('De eigen SSH-private sleutel ontbreekt.')
 with zipfile.ZipFile(a.bar) as z:
@@ -17,7 +17,7 @@ with zipfile.ZipFile(a.bar) as z:
     if '\nPackage-Name: com.classicchat.client\n' not in manifest or '\nPackage-Architecture: armle-v7\n' not in manifest:
         p.error('Dit is niet het verwachte Classic Chat ARM-pakket.')
     if z.read('native/classicchat')[:6]!=b'\x7fELF\x01\x01':p.error('Geen ARM ELF32-applicatie.')
-    expected_assets={name:z.read(name) for name in ['native/classicchat','native/assets/main.qml','native/assets/SettingsPage.qml','native/assets/HistoryPage.qml']}
+    expected_assets={name:z.read(name) for name in ['native/classicchat','native/assets/main.qml','native/assets/SettingsPage.qml','native/assets/HistoryPage.qml','native/assets/certificates/isrgrootx1.pem']}
 user='devuser' if a.via_devuser_root_helper else 'root'
 ssh=['ssh','-o','BatchMode=yes','-o','ConnectTimeout=10','-o','StrictHostKeyChecking=yes','-i',str(key),user+'@'+ip]
 if a.known_hosts:

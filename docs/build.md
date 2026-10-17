@@ -16,7 +16,7 @@ De opzet is ontleend aan [XIAZY/blackberry10-toolchain](https://github.com/XIAZY
 `tools/build-native.py` vereist expliciete paden en stopt bij iedere fout. Het bouwt en verpakt uitsluitend; het benadert geen telefoon. Vanaf deze workspace is de uitgevoerde aanroep:
 
 ```sh
-python3 work/classic-chat/tools/build-native.py \
+python3 tools/build-native.py \
   --sdk work/bb10-sdk/target_10_3_1_995/qnx6 \
   --override work/bb10-sdk/target_10_3_1_995/target-override \
   --moc work/build-tools/moc/moc \
@@ -44,3 +44,13 @@ De packager genereert ontwikkel-identiteiten en een manifest. Dat vormt geen Bla
 ## Runtime-correctie, 17 oktober 2026
 
 Link ook `bbsystem` en registreer de gebruikte bb.system-QML-types vóór het laden van main.qml. Alleen compileren en verpakken detecteerde de ontbrekende QML-types niet; deze zijn op het echte toestel gecontroleerd.
+
+## Native HTTPS, versie 0.1.1
+
+De targetheaders zijn ouder dan de runtime: het geteste toestel levert libcurl 7.42.0 / OpenSSL 1.0.2g. De app controleert bij starten dat libcurl minstens 7.34 is en gebruikt de ABI-waarde 6 voor TLS 1.2, die in de oude SDK-header nog geen naam heeft. De nieuwe RelayReply-worker wordt met moc verwerkt en linkt libcurl, libssl en libcrypto. De init gebeurt vóór de UI/workerthreads en installeert de voor OpenSSL 1.0 benodigde callbacks als die ontbreken. Certificaat- en hostnaamcontrole staan aan, alleen HTTPS is toegestaan, redirects staan uit, antwoorden zijn begrensd op 256 KiB en de aanvraag op 100 seconden. Annuleren gebruikt een atomische vlag. De interface blijft tijdens netwerkverkeer reageren.
+
+De qmake-projectfile en het expliciete bouwscript bevatten dezelfde nieuwe bronnen. Het resultaat heet build/ClassicChat-0.1.1-unsigned.bar.
+
+Voeg `--network-probe` toe aan dezelfde bouwopdracht om ook `build/network-probe` te maken. Dit gebruikt de echte RelayReply-code en stuurt een leeg verzoek met een ongeldig token; er wordt geen model aangeroepen. Voer het op het toestel uit vanuit een testdirectory die het publieke certificaat bevat onder app/native/assets/certificates/isrgrootx1.pem, met LD_LIBRARY_PATH=/usr/lib/qt4/lib en de volledige HTTPS-URL naar /v1/chat als argument. Succes is finished=1, status=401, error=0. Een onjuist HTTPS-hostadres of een HTTP-URL moet falen. Het controleert netwerk en authenticatie; geen echt AI-antwoord.
+
+De trustanchor komt rechtstreeks van https://letsencrypt.org/certs/isrgrootx1.pem, gekoppeld via https://letsencrypt.org/certificates/. SHA256-certificaatfingerprint: 96:BC:EC:06:26:49:76:F3:74:60:77:9A:CF:28:C5:A7:CF:E8:A3:C0:AA:E1:1A:8F:FC:EE:05:C0:BD:DF:08:C6. Dit is een openbaar CA-certificaat, geen private sleutel.

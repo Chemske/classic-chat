@@ -2,7 +2,7 @@
 <qnx xmlns="http://www.qnx.com/schemas/application/1.0">
     <id>com.classicchat.client</id>
     <name>Classic Chat</name>
-    <versionNumber>0.1.0</versionNumber>
+    <versionNumber>0.1.1</versionNumber>
     <description>Een eenvoudige native tekstchat via je eigen server.</description>
     <author>Classic Chat</author>
     <icon><image>assets/icon.png</image></icon>

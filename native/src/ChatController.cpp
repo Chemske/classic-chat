@@ -1,4 +1,5 @@
 #include "ChatController.hpp"
+#include "RelayReply.hpp"
 #include <bb/data/JsonDataAccess>
 #include <QDir>
 #include <QFile>
@@ -6,7 +7,6 @@
 #include <QTemporaryFile>
 #include <QDateTime>
 #include <QNetworkRequest>
-#include <QSslConfiguration>
 #include <QUuid>
 #include <QRegExp>
 #include <QUrl>
@@ -50,7 +50,7 @@ const char * const sdRoot = "/accounts/1000/removable/sdcard";
 ChatController::ChatController(QObject *parent) : QObject(parent),
     m_messages(new bb::cascades::ArrayDataModel(this)),
     m_chats(new bb::cascades::ArrayDataModel(this)),
-    m_settings("ClassicChat", "ClassicChat"), m_network(this), m_reply(0),
+    m_settings("ClassicChat", "ClassicChat"), m_reply(0),
     m_dirty(false), m_cancelled(false), m_timedOut(false), m_tooLarge(false) {
     m_timer.setSingleShot(true); m_timer.setInterval(100000);
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(timedOut()));
@@ -163,14 +163,10 @@ void ChatController::sendMessage(const QString &input) {
     QVariantMap payload; payload["messages"] = history; const QByteArray bytes = encode(payload);
     if (bytes.isEmpty()) { setStatus("Het bericht kon niet worden omgezet."); return; }
     QNetworkRequest request(QUrl(serverUrl() + "/v1/chat"));
-    QSslConfiguration tls = QSslConfiguration::defaultConfiguration();
-    tls.setProtocol(QSsl::SecureProtocols);
-    request.setSslConfiguration(tls);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
-    request.setRawHeader("Authorization", "Bearer " + m_settings.value("deviceToken").toString().toUtf8());
-    // QNetworkAccessManager retains certificate verification; never ignore sslErrors.
+    // RelayReply verifies the HTTPS hostname and CA using native TLS 1.2.
     m_response.clear(); m_pending = text; m_cancelled = m_timedOut = m_tooLarge = false;
-    m_reply = m_network.post(request, bytes);
+    m_reply = new RelayReply(request, bytes, m_settings.value("deviceToken").toString().toUtf8(), this);
     connect(m_reply, SIGNAL(readyRead()), this, SLOT(receiveChunk()));
     connect(m_reply, SIGNAL(finished()), this, SLOT(finished()));
     m_timer.start(); setStatus("Antwoord ophalen…");

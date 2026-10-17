@@ -1,21 +1,15 @@
-# Classic Chat — werkende native installatie, 17 oktober 2026
+# Classic Chat — 17 oktober 2026
 
-Classic Chat is op de BlackBerry Classic SQC100-1 geïnstalleerd via de voorbereide root-pakketinstaller, zonder debug token. Het programma en de QML-schermen zijn teruggelezen en komen exact overeen met het geleverde BAR-pakket. De app blijft draaien; QML meldt geen laadfouten. De gebruiker bevestigt dat chatten werkt.
+Versie 0.1.1 staat op de BlackBerry Classic SQC100-1, OS 10.3.3.3216 / radio 10.3.3.3217. Native tekstchat, internetzoeken met bronverwijzingen, compacte donkere interface en SD-opslag zijn eerder op het toestel bevestigd. De gebruiker bevestigt ook dat de nieuwe versie een echt antwoord geeft via https://classicchat.130-61-37-71.sslip.io.
 
-Het toestel gebruikt HTTPS naar de eigen Oracle VPS. Alleen het aparte toestel-token staat in de privé-instellingen van de app; de OpenAI API-sleutel blijft op de server. Het eenmalige configuratiebestand is na import verwijderd. Het actuele tijdelijke adres is https://pts-bracelets-beginners-organizational.trycloudflare.com. De Mac hoeft voor chatgebruik niet aan te staan. Het tijdelijke adres kan bij een tunnelherstart veranderen.
+De broncode staat op https://github.com/Chemske/classic-chat. De eerste werkende basis is bewaard als v0.1.0. Private configuraties, SSH-sleutels, media, firmware en back-ups zijn uitgesloten.
 
-Een geslaagd gesprek is daadwerkelijk op de SD-kaart aangetroffen in ClassicChat/chats. Het JSON-bestand is uitgelezen en bevat zowel het gebruikersbericht als een niet-leeg antwoord. De inhoud is niet in het publieke testverslag opgenomen. De app schrijft geen chats naar interne opslag wanneer SD-opslag is ingeschakeld en de kaart ontbreekt.
+Een volledige toestelherstart is uitgevoerd. De standaard mobiele dienst coreServices2 startte vanzelf en de gebruiker bevestigde dat mobiel netwerk aan bleef. De root-bootstrap voltooide opnieuw en meldde daarna succes. Een eerste poging Classic Chat te openen vóór dat moment sloot onmiddellijk; na voltooiing bleef de app open. Wacht na een volgende herstart dus op het beginscherm én voltooiing van de root-voorbereiding. Eén herstart is bevestigd; langdurige betrouwbaarheid is nog niet vastgesteld.
 
-De opstartfout was een niet-geregistreerd SystemDialog-type. De build linkt nu bbsystem en registreert SystemDialog, SystemUiButton en SystemUiResult vóór het laden van QML. Ook het privé-opslagpad is gecorrigeerd: QDir::homePath() verwijst op dit toestel al naar de data-map. De installer controleert dat geen meerdere SUD-werkers actief zijn en vergelijkt de geïnstalleerde programmabestanden na installatie.
+De VPS is ook volledig herstart. De boot-ID veranderde en relay, HTTPS-proxy en vast adres kwamen automatisch terug. De Mac is voor chatgebruik niet nodig. Er is geen Cloudflare-account of eigen domein vereist; het adres blijft afhankelijk van het bestaande publieke IP en sslip.io.
 
-TXT-export, chats heropenen/verwijderen via de interface, mobiel internet en functioneren na een volledige toestelherstart zijn nog niet apart gecontroleerd. Herstart het toestel voorlopig niet alleen om te testen; de root-opstartketen en de USB-netwerkconfiguratie moeten nog verder worden gecontroleerd. Wifi werkt.
+Qt op dit toestel bood alleen TLS 1.0 aan. Versie 0.1.1 gebruikt daarom een cancellable worker met de aanwezige native libcurl en expliciet TLS 1.2. Het publieke ISRG Root X1-certificaat is gebundeld. Certificaat- en hostnaamcontrole blijven verplicht; HTTP en redirects worden niet gevolgd. Het aparte toestel-token staat alleen in de private appinstellingen; de OpenAI-sleutel blijft op de VPS. Het eenmalige setupbestand is na import verwijderd.
 
-De telefoon is eerder met originele OS- en radiofirmware hersteld en daarna met de aangepaste gebruikerspartitie opgestart. Er is een gecontroleerde kopie van gedeelde bestanden en de SD-kaart, maar geen volledige privégegevens- of ruwe firmwareback-up. Voor deze crashfix is geen firmware opnieuw geflasht en zijn geen andere apps verwijderd.
+Het geïnstalleerde programma, de drie QML-schermen en het CA-certificaat zijn teruggelezen en komen exact met de nieuwe BAR overeen. De app laadt zonder QML-fouten. In deze update is geen firmware geflasht, geen andere app verwijderd en geen chat/media gewist.
 
-## Donker ontwerp en internetzoeken
-
-De donkere update is geïnstalleerd; webzoeken met bronverwijzingen is ingeschakeld op de VPS. Zie `docs/dark-web-update.md` voor de actuele controles.
-
-## Compactere interface
-
-De vaste onderbalk is vervangen door Menu rechtsboven. De bovenbalk is lager en vult de volledige breedte. Zie `docs/compact-ui-update.md`.
+Chats staan standaard op SD onder ClassicChat/chats; exports onder ClassicChat/exports. TXT-export en de volledige geschiedenisinterface zijn nog niet apart doorlopen. Streaming en bijlagen zijn nog niet geïmplementeerd. Zie VPS-handleiding.md, build.md en recovery.md voor beheer en herstel.

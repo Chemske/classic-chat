@@ -1,6 +1,12 @@
-# Vervang dit voorbeeld-domein door je eigen domein.
+{
+    acme_ca https://acme-v02.api.letsencrypt.org/directory
+}
+
+# Replace the hostname with your DNS name pointing to the VPS.
 chat.example.com {
+    tls {
+        key_type rsa2048
+    }
+    header -Server
     reverse_proxy 127.0.0.1:8787
 }
-# Test de certificaatketen en TLS-compatibiliteit op de Classic voordat je dit gebruikt.
-# Schakel certificaatcontrole in de telefoonapp niet uit.

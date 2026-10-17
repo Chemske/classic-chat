@@ -1,0 +1,12 @@
+{
+    acme_ca https://acme-v02.api.letsencrypt.org/directory
+}
+
+# Replace the hostname with your DNS name pointing to the VPS.
+chat.example.com {
+    tls {
+        key_type rsa2048
+    }
+    header -Server
+    reverse_proxy 127.0.0.1:8787
+}

@@ -28,3 +28,14 @@ Internetadres.txt
 /media/
 /ssh-to-vps/
 /vps/
+
+# Local TLS state and older workstation research (retained locally).
+*.srl
+/docs/device-install-result.txt
+/docs/installatie-onderzoek.md
+/docs/installatieblokkade.md
+/docs/lokaal-gebruik.md
+/docs/package-manifest.txt
+
+# Public trust anchor, never a private key.
+!/native/assets/certificates/isrgrootx1.pem

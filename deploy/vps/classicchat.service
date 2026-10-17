@@ -1,5 +1,5 @@
 [Unit]
-Description=Classic Chat relay and temporary HTTPS tunnel
+Description=Classic Chat private relay behind Caddy HTTPS
 Wants=network-online.target
 After=network-online.target
 StartLimitIntervalSec=0
@@ -9,7 +9,7 @@ Type=simple
 User=classicchat
 Group=classicchat
 WorkingDirectory=/var/lib/classicchat
-ExecStart=/opt/classicchat/node/bin/node /opt/classicchat/server/remote-service.mjs
+ExecStart=/opt/classicchat/node/bin/node --env-file=/etc/classicchat/relay.env /opt/classicchat/server/server.mjs
 Restart=on-failure
 RestartSec=10
 TimeoutStopSec=15

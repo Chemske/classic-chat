@@ -2,11 +2,13 @@
 
 Een native AI-chatapp voor de BlackBerry Classic met BlackBerry 10. De C++/QML-client gebruikt Cascades en praat via HTTPS met een eigen Node.js-tussenserver. De OpenAI API-sleutel blijft op de server; het toestel gebruikt een afzonderlijk toegangstoken.
 
-## Huidige versie
+## Huidige versie — 0.1.1
 
 De werkende basis is op 17 oktober 2026 getest op een SQC100-1 met OS 10.3.3.3216 en radio 10.3.3.3217. Chatten, internetzoeken met bronverwijzingen en automatisch opslaan op SD zijn op het toestel bevestigd. De donkere interface heeft een compacte bovenbalk en een Menu-knop voor gesprekken en instellingen.
 
 De app ondersteunt tekstgesprekken, annuleren, lokale gespreksgeschiedenis en TXT-export. De server biedt het model een webzoekfunctie aan. De huidige client ontvangt het volledige antwoord; streaming, bestandsbijlagen en foto-invoer zijn geplande uitbreidingen.
+
+Versie 0.1.1 gebruikt de aanwezige native libcurl met TLS 1.2 en een gebundeld publiek ISRG Root X1-certificaat. Certificaat- en hostnaamcontrole blijven ingeschakeld. Het vaste serveradres is op de BlackBerry getest met een echt antwoord.
 
 ## Project
 
@@ -44,8 +46,8 @@ Sleutels, tokens, persoonlijke media, toestelback-ups, firmware-images en ontwik
 
 ## Bekende aandachtspunten
 
-- Een tijdelijk Cloudflare-adres kan na een tunnelherstart wijzigen. Een vast adres wordt afzonderlijk ingericht.
-- Herstartgedrag van de aangepaste toestelomgeving moet nog worden gecontroleerd.
+- Het vaste adres is https://classicchat.130-61-37-71.sslip.io. Het blijft afhankelijk van sslip.io en het publieke VPS-IP. Zie [de VPS-handleiding](docs/VPS-handleiding.md).
+- Toestel en VPS zijn volledig herstart en gecontroleerd. Wacht op het toestel tot de root-voorbereiding klaar is voordat je de app opent; een eerdere start kan sluiten. Zie [de huidige status](docs/huidige-status.md).
 - Bij een eerder uitgeschakelde mobiele radio bleek `coreServices2` niet te draaien. Starten van de oorspronkelijke dienst herstelde de netwerkschakelaar. Zie [de herstelnotities](docs/recovery.md).
 - TXT-export, de volledige geschiedenisinterface en ontbrekende/volle SD-kaarten zijn nog niet allemaal apart getest.
 

@@ -1,0 +1,16 @@
+# Optional historical transport for development; a restart changes the quick-tunnel URL.
+[Unit]
+Description=Classic Chat development relay and temporary tunnel
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=classicchat
+Group=classicchat
+ExecStart=/opt/classicchat/node/bin/node /opt/classicchat/server/remote-service.mjs
+Restart=on-failure
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

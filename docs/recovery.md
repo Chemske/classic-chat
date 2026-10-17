@@ -30,4 +30,12 @@ Voer die alleen uit vanuit een gecontroleerde rootverbinding wanneer de dienst o
 4. Controleer wifi, simkaart, mobiele radio, coreServices2 en het openen van Classic Chat.
 5. Als de app niet start, leg eerst foutcode en rootstatus vast; installeer of flash niet blind opnieuw.
 
-De uitkomst van die volledige herstarttest is bij de eerste broncodeversie nog niet bevestigd.
+De uitgevoerde controle staat hieronder.
+
+## Herstartcontrole, 17 oktober 2026
+
+Een volledige normale toestelherstart is bevestigd. coreServices2 startte zelfstandig; mobiel netwerk bleef volgens de gebruiker aan. Roottoegang via de bestaande helper is opnieuw gecontroleerd. De bootstrap meldt na enige tijd dat het toestel rooted is. Classic Chat sloot bij een start vóór die voltooiing, maar bleef daarna open. Wacht na herstart op de root-melding en open de app opnieuw; flash daarvoor geen firmware.
+
+Een eerdere opdracht via de Mac werd onderbroken voordat de normale afsluitprocedure klaar was. Gebruik het aan/uitmenu voor een normale herstart; stuur geen tweede herstart terwijl de eerste loopt. Er is voor deze controle geen firmware overgedragen.
+
+Versie 0.1.1 is daarna als appupdate geïnstalleerd en byte voor byte gecontroleerd, inclusief het openbare CA-certificaat. De oorspronkelijke werkende bron blijft in Git-tag v0.1.0. Gebruik bij een rollback ook het installatiescript uit die tag: de nieuwere installer verwacht aanvullend het CA-bestand dat nog niet in het oude pakket zat. De BAR-bestanden en bestaande privé-back-ups blijven lokaal en horen niet in Git. De oude tijdelijke endpoint is gestopt; een oude build heeft geen bevestigde TLS 1.2-route naar het nieuwe vaste adres.
