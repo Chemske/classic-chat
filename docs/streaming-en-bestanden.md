@@ -41,7 +41,7 @@ Twintig geautomatiseerde servertests slagen, inclusief gesplitste UTF-8/SSE-frag
 
 Live op de VPS zijn tekststreaming, een gegenereerd tekstbestand en het teruglezen van een testcode uit een tekstbijlage bevestigd. Een grotere JPEG-testafbeelding met testtekst is correct herkend. Een eerdere kleine vlakke kleurafbeelding werd inhoudelijk verkeerd benoemd, ook bij een rechtstreekse provider-aanvraag: beeldinterpretatie blijft modeluitvoer en moet gecontroleerd worden.
 
-De echte native browser- en downloadcode is met een wegwerp-testchat op het toestel uitgevoerd. Het opgeslagen bestand kwam byte voor byte overeen. De gebruiker heeft SD-mapnavigatie, de gecorrigeerde opslagknop en zichtbare streaming bevestigd. Daarna zijn de bestandskiezer naar een raster en de ruimte/automatische scroll tijdens streaming verder verfijnd; die laatste visuele aanpassing wordt nog op het toestel nagekeken. Foto’s met EXIF-rotatie en volle/plotseling verwijderde SD-kaarten zijn nog niet afzonderlijk doorlopen.
+De echte native browser- en downloadcode is met een wegwerp-testchat op het toestel uitgevoerd. Het opgeslagen bestand kwam byte voor byte overeen. De gebruiker heeft SD-mapnavigatie, de gecorrigeerde opslagknop en zichtbare streaming bevestigd. Daarna zijn de bestandskiezer naar een raster en de ruimte/automatische scroll tijdens streaming verder verfijnd; de gebruiker heeft ook die laatste visuele aanpassing bevestigd. Foto’s met EXIF-rotatie en volle/plotseling verwijderde SD-kaarten zijn nog niet afzonderlijk doorlopen.
 
 ## Officiële API-bronnen
 

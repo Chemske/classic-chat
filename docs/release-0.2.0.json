@@ -41,11 +41,10 @@
     "streaming": true,
     "long_reply_following": true,
     "sd_folder_navigation": true,
-    "download_button": true
+    "download_button": true,
+    "thumbnail_grid_and_photo_previews": true
   },
-  "pending_visual_check": [
-    "Latest thumbnail grid after QML syntax fix"
-  ],
+  "pending_visual_check": [],
   "bar_sha256": "dd30522f3b0017532f8c3b172ffa1807cc7aa123a14bd3cbcd2f526cc22ae78d",
   "installed_asset_readback_verified": 9,
   "qml_validation": {
