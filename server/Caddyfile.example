@@ -1,0 +1,6 @@
+# Vervang dit voorbeeld-domein door je eigen domein.
+chat.example.com {
+    reverse_proxy 127.0.0.1:8787
+}
+# Test de certificaatketen en TLS-compatibiliteit op de Classic voordat je dit gebruikt.
+# Schakel certificaatcontrole in de telefoonapp niet uit.

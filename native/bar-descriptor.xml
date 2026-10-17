@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<qnx xmlns="http://www.qnx.com/schemas/application/1.0">
+    <id>com.classicchat.client</id>
+    <name>Classic Chat</name>
+    <versionNumber>0.1.0</versionNumber>
+    <description>Een eenvoudige native tekstchat via je eigen server.</description>
+    <author>Classic Chat</author>
+    <icon><image>assets/icon.png</image></icon>
+    <!-- A real, valid author identity/signing route is still required for a stock phone. -->
+    <initialWindow><systemChrome>none</systemChrome><transparent>false</transparent><autoOrients>false</autoOrients></initialWindow>
+    <platformArchitecture>armle-v7</platformArchitecture>
+    <asset path="arm/o.le-v7/classicchat" entry="true" type="Qnx/Elf">classicchat</asset>
+    <asset path="assets">assets</asset>
+    <permission system="true">run_native</permission>
+    <permission>access_internet</permission>
+    <permission>access_shared</permission>
+    <env var="LD_LIBRARY_PATH" value="app/native/lib:/usr/lib/qt4/lib"/>
+    <env var="QT_QPA_PLATFORM" value="blackberry"/>
+    <env var="QML_IMPORT_PATH" value="app/native/imports"/>
+    <env var="CASCADES_THEME" value="dark"/>
+</qnx>

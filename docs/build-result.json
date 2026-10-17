@@ -1,0 +1,99 @@
+{
+  "bar": "ClassicChat-0.1.0-unsigned.bar",
+  "bytes": 42150,
+  "sha256": "afb0584295c0d16cd5fbe02c38d7ac98bfc11a835a0fcc3243358ec705445c27",
+  "zip_crc": "passed",
+  "manifest_asset_sha512": "passed",
+  "arm_elf32": "passed",
+  "development_mode": true,
+  "signed": false,
+  "files": [
+    "META-INF/MANIFEST.MF",
+    "native/bar-descriptor.xml",
+    "native/classicchat",
+    "native/assets/icon.png",
+    "native/assets/SettingsPage.qml",
+    "native/assets/HistoryPage.qml",
+    "native/assets/main.qml"
+  ],
+  "phone_install_result": "Geïnstalleerd zonder debug token; native chat door gebruiker bevestigd.",
+  "existing_apps_before_after_identical": "Historische controle vóór huidige firmwareherstel; geen actuele claim na herstel.",
+  "not_tested_on_phone": [
+    "TXT export",
+    "chat reopen/delete UI",
+    "mobile data network",
+    "persistence after a full phone reboot"
+  ],
+  "api_live_test_historical": {
+    "status": 200,
+    "model": "gpt-4.1-mini",
+    "response": "Classic Chat werkt.",
+    "paid_test_requests": 2
+  },
+  "api_public_test_historical": {
+    "url": "https://fighters-reflection-bundle-something.trycloudflare.com",
+    "verifiedAt": "2026-10-16T13:43:51.251Z",
+    "vantage": "Mac via publiek Cloudflare-adres, geen mobiele toesteltest",
+    "health": {
+      "status": 200,
+      "body": {
+        "ok": true,
+        "demo": false
+      }
+    },
+    "page": {
+      "status": 200,
+      "showsOnline": true
+    },
+    "secretFilePath": 404,
+    "noToken": 401,
+    "wrongToken": 401,
+    "authenticatedChat": {
+      "status": 200,
+      "text": "Internetverbinding werkt.",
+      "demo": false
+    }
+  },
+  "mac_https_health_historical": {
+    "ok": true,
+    "demo": false
+  },
+  "configuration_import": "Private eenmalige setup in eigen appdata; geen OpenAI API-sleutel op telefoon.",
+  "native_runtime_verification": {
+    "checked_at": "2026-10-17T00:37:10.438012+02:00",
+    "sha256": "afb0584295c0d16cd5fbe02c38d7ac98bfc11a835a0fcc3243358ec705445c27",
+    "bytes": 42150,
+    "zip_crc_valid": true,
+    "manifest_assets_verified": 6,
+    "elf_architecture": "ELF32 ARM",
+    "device_installation_verified": true,
+    "installed_executable_and_qml_readback_match": true,
+    "qml_errors_at_launch": 0,
+    "native_chat_user_confirmed": true,
+    "sd_chat_json_readback_verified": true,
+    "debug_token_used": false,
+    "not_yet_verified": [
+      "TXT export",
+      "chat reopen/delete UI",
+      "mobile data network",
+      "persistence after a full phone reboot"
+    ],
+    "dark_theme": true,
+    "server_tests_passed": 13,
+    "web_search_live_test": {
+      "checked_at": "2026-10-17T00:30:08.899897+02:00",
+      "url": "https://pts-bracelets-beginners-organizational.trycloudflare.com",
+      "http_status": 200,
+      "web_search_used": true,
+      "inline_citation_count": 1,
+      "answer_characters": 299,
+      "paid_test_requests": 1
+    },
+    "paid_web_test_requests_this_update": 2,
+    "new_layout_visual_confirmation": "Previous dark layout and native web chat confirmed by user; compact menu awaits visual confirmation",
+    "source_link_browser_test": "pending user feedback",
+    "compact_header": true,
+    "chat_bottom_action_bar_removed": true,
+    "actions_in_header_menu": true
+  }
+}

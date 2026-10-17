@@ -1,0 +1,9 @@
+{
+  "checkedAt": "2026-10-16T20:28:20.379Z",
+  "host": "130.61.37.71",
+  "url": "https://retrieve-cos-questions-fancy.trycloudflare.com",
+  "status": 200,
+  "text": "VPS werkt.",
+  "demo": false,
+  "realProviderRequest": true
+}

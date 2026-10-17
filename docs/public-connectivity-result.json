@@ -1,0 +1,26 @@
+{
+  "checked_at_utc": "2026-10-16T20:48:00.409508+00:00",
+  "url": "https://retrieve-cos-questions-fancy.trycloudflare.com",
+  "host": "Oracle VPS",
+  "temporary": true,
+  "mac_required": false,
+  "tests": [
+    {
+      "path": "/health",
+      "http_status": 200
+    },
+    {
+      "path": "/.env",
+      "http_status": 404
+    },
+    {
+      "path": "/v1/chat",
+      "http_status": 401
+    }
+  ],
+  "paid_openai_request_in_this_check": false,
+  "real_vps_api_test_file": "ClassicChat-VPS-test.json",
+  "phone_browser_connectivity_tested": true,
+  "phone_browser_result": "User confirmed Werkt",
+  "native_client_connectivity_tested": false
+}

@@ -1,0 +1,6 @@
+{
+  "cloudflared": "/opt/classicchat/bin/cloudflared",
+  "envFile": "/etc/classicchat/relay.env",
+  "stateDirectory": "/var/lib/classicchat",
+  "internetAddressFile": "/var/lib/classicchat/Internetadres.txt"
+}
